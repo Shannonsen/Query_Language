@@ -8,8 +8,6 @@ $OR = "OR";
 $AND = "AND";
 $NOT = "NOT";
 
-$sentence = "SELECT product_name, quantity_per_unit, category FROM products  WHERE";
-
 //solicitar la consulta de javascript a php
 if (isset($_REQUEST['search']) && $_REQUEST['search'] != "") {
     $query = $_REQUEST['search'];
@@ -17,18 +15,15 @@ if (isset($_REQUEST['search']) && $_REQUEST['search'] != "") {
     //separar la consulta en palabras
     $queryparts = SEPARAR_ESPACIOS($query);
 
-    $initialSentence = " Concat(product_name, quantity_per_unit, category) LIKE " . "'%" . $queryparts[0] . "%'";
-    /*
-        if(SIN_PARENTESIS(LAST_WORD($queryparts))== "CAMPOS"){
-            $sentence = "SELECT ".  "FROM products  WHERE";
-        }
-        */
     $data = array();
+    $campos="";
 
     if (SIN_PARENTESIS(LAST_WORD($queryparts)) == "CAMPOS") {
 
+        echo "ESTOY EN LA CONDICION DE CAMPOS";
+        /*
         $lastword = LAST_WORD(($queryparts));
-        $campos = CAMPOS($lastword);
+        $campos = ENTRE_PARENTESIS($lastword);
 
         $campos_divididos = SEPARAR_COMAS($campos);
         for ($n = 0; $n < count($campos_divididos); $n++) {
@@ -38,34 +33,52 @@ if (isset($_REQUEST['search']) && $_REQUEST['search'] != "") {
             $table = $campos_completos[0];
             $data[] = $campos_completos[1];
 
-            for($i=0; $i < count($data); $i++){
-                echo "<br>" . $data[$i];
-            }
-        }
-    }else{
-        for ($j = 0; $j < count($queryparts); $j++) {
-            echo "<br>" . $queryparts[$j];
-            if ($queryparts[$j] == $OR) {
-
-              $sentence_or = OPERATOR_OR($queryparts[$j],$queryparts[$j + 1]);
-              $initialSentence = $initialSentence . $sentence_or;
-
-            } else {
-                if ($queryparts[$j] == $AND) {
-                    if ($queryparts[$j + 1] == $NOT) {
-                        $parenthesis = "(" . $initialSentence;
-                        $initialSentence = $parenthesis;
-                       $sentence_andnot = OPERATOR_ANDNOT($queryparts[$j],$queryparts[$j + 1], $queryparts[$j + 2]);
-                        $initialSentence = $initialSentence . $sentence_andnot;
-                    } else {
-                        $parenthesis = "(" . $initialSentence;
-                        $initialSentence = $parenthesis;
-                        $sentence_and = OPERATOR_AND($queryparts[$j],$queryparts[$j + 1]);
-                        $initialSentence = $initialSentence . $sentence_and;
-                    }
+            for ($i = 0; $i < count($data); $i++) {
+                //echo "<br>" . $data[$i];
+                if($i==0){
+                $data_string = $data[$i];
+                }else{
+                    $data_string = $data_string . "," . $data[$i];
                 }
-            }
+            }       
         }
+        echo " <br> dataString:" . $data_string;
+        	*/
+
+        $campos = CAMPOS($queryparts);
+        $table = getTable($queryparts);
+        $sentence = "SELECT ". $campos . " FROM " . $table . " WHERE ";
+        $initialSentence = "Concat(". $campos . ") LIKE " . "'%" . $queryparts[0] . "%'";
+
+        $initialSentence = QUERY($campos,$queryparts, $initialSentence,$OR,$AND,$NOT);
+        $sentence = $sentence . $initialSentence;
+
+        echo "<br>" . $sentence . "<br>";
+        $result = mysqli_query($con, $sentence);
+
+        if (!$result) {
+            var_dump(mysqli_error($con));
+            exit;
+        }
+        
+        $data = CAMPOS_ARRAY($queryparts) ;
+
+        while ($row = mysqli_fetch_assoc($result)) {
+        
+                for($r = 0; $r < count($data); $r++){
+                    echo "<br>". $data[$r]. " = " . $row[$data[$r]];
+                }
+                echo "<br>";
+        }
+
+    } else {
+
+        $sentence = "SELECT product_name, quantity_per_unit, category FROM products  WHERE";
+        $initialSentence = " Concat(product_name, quantity_per_unit, category) LIKE " . "'%" . $queryparts[0] . "%'";
+
+        $campos = "product_name, quantity_per_unit, category";
+
+        $initialSentence = QUERY($campos,$queryparts, $initialSentence,$OR,$AND,$NOT);
 
         $sentence = $sentence . $initialSentence;
 
@@ -78,7 +91,10 @@ if (isset($_REQUEST['search']) && $_REQUEST['search'] != "") {
         }
 
         while ($row = mysqli_fetch_assoc($result)) {
-            echo "<br>" . $row["product_name"] . $row["quantity_per_unit"] . $row["category"];
+            echo "<br> product_name = " . $row["product_name"] ;
+            echo" <br> quantity_per_unit = ". $row["quantity_per_unit"];
+            echo "<br> category = " . $row["category"];
+            echo "<br>" ;
         }
     }
 }
