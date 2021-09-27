@@ -12,10 +12,16 @@ function connect()
     if ($con->connect_error) {
         die("Ha fallado la conexion: " . $con->connect_error);
     }
-    echo "Conectado correctamente";
+    echo alert("Successfull Connection");
     return $con;
 }
 
+function alert($message)
+{
+    return "<script>alert('$message')</script>";
+}
+
+//devuelve array de campos
 function FIELDS_ARRAY($queryparts)
 {
     $data = array();
@@ -24,7 +30,7 @@ function FIELDS_ARRAY($queryparts)
 
     $campos_divididos = BREAK_COMMAS($campos);
     for ($n = 0; $n < count($campos_divididos); $n++) {
-        echo "<br>" . $campos_divididos[$n];
+        //echo "<br>" . $campos_divididos[$n];
         $campos_completos = BREAK_POINTS($campos_divididos[$n]);
 
         $table = $campos_completos[0];
@@ -33,6 +39,7 @@ function FIELDS_ARRAY($queryparts)
     return $data;
 }
 
+//devuelve la concatenacion de campos en un string
 function FIELDS($queryparts)
 {
     $data_string = "";
@@ -41,7 +48,7 @@ function FIELDS($queryparts)
 
     $campos_divididos = BREAK_COMMAS($campos);
     for ($n = 0; $n < count($campos_divididos); $n++) {
-        echo "<br>" . $campos_divididos[$n];
+       // echo "<br>" . $campos_divididos[$n];
         $campos_completos = BREAK_POINTS($campos_divididos[$n]);
 
         $table = $campos_completos[0];
@@ -59,6 +66,7 @@ function FIELDS($queryparts)
     return $data_string;
 }
 
+//devuelve tabla para la consulta
 function getTable($queryparts)
 {
     $data_string = "";
@@ -67,7 +75,7 @@ function getTable($queryparts)
 
     $campos_divididos = BREAK_COMMAS($campos);
     for ($n = 0; $n < count($campos_divididos); $n++) {
-        echo "<br>" . $campos_divididos[$n];
+        //echo "<br>" . $campos_divididos[$n];
         $campos_completos = BREAK_POINTS($campos_divididos[$n]);
 
         $table = $campos_completos[0];
@@ -132,6 +140,7 @@ function BREAK_SPACES($cadena)
 
 //-------------- FUNCTIONS OPERATORS --------------
 
+//concatena los campos para consulta mas eficiente
 function QUERY_CONCAT($fields, $query)
 {
     $query_concat = " Concat(" . $fields . ")" . " LIKE '%" .  $query . "%'";
@@ -142,18 +151,28 @@ function QUERY($queryparts, $fields)
 {
     $query_initial = "SELECT " . $fields . " FROM " . "products " . "WHERE ";
     $query = "";
+    $campos="";
+    $count = 0;
+
     for ($j = 0; $j < count($queryparts); $j++) {
         switch ($queryparts[$j]) {
             case "OR":
                 $query .= " OR ";
+                $count++;
                 break;
             case "AND":
-                $query .= ") AND ";
-                $parentesis = $query_initial . "(";
-                $query_initial = $parentesis;
+                if ($count == 0) {
+                    $query .= " AND ";
+                } else {
+                    $query .= ") AND ";
+                    $parentesis = $query_initial . "(";
+                    $query_initial = $parentesis;
+                }
+                $count++;
                 break;
             case "NOT":
                 $query .= "NOT ";
+                $count++;
                 break;
             default:
                 $verification = strstr($queryparts[$j], '(', true); //verifica si es CADENA O PATRON.
@@ -162,10 +181,12 @@ function QUERY($queryparts, $fields)
                         echo " <br> QUERYPARTS: " . $queryparts[$j] . " <br>";
                         $Inside_parentheses = substr(strstr($queryparts[$j], '('), 1, -1);
                         $query .= QUERY_CONCAT($fields, $Inside_parentheses);
+                        $count++;
                         break;
                     case 'PATRON':
                         $Inside_parentheses = substr(strstr($queryparts[$j], '('), 1, -1);
                         $query .= QUERY_CONCAT($fields, $Inside_parentheses);
+                        $count++;
                         break;
                     case 'CAMPOS':
                         break;
@@ -177,8 +198,7 @@ function QUERY($queryparts, $fields)
         }
     }
     $query_final = $query_initial . $query;
-    echo $query_final . "<br/><br/>";
+    //echo $query_final . "<br/><br/>";
 
     return $query_final;
 }
-
