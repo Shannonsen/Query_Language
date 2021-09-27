@@ -1,26 +1,28 @@
-<?php 
+<?php
 
-function connect(){
-    $user ="root";
+function connect()
+{
+    $user = "root";
     $password = "";
     $server = "localhost";
-    $db= "northwind";
-    
-    $con = new mysqli($server, $user, $password,$db);
-    
+    $db = "northwind";
+
+    $con = new mysqli($server, $user, $password, $db);
+
     if ($con->connect_error) {
         die("Ha fallado la conexion: " . $con->connect_error);
-    } 
+    }
     echo "Conectado correctamente";
     return $con;
 }
 
-function CADENA($cadena){
-
+function CADENA($cadena)
+{
 }
 
-function CAMPOS_ARRAY($queryparts){
-    $data_string="";
+function CAMPOS_ARRAY($queryparts)
+{
+    $data = array();
     $lastword = LAST_WORD(($queryparts));
     $campos = ENTRE_PARENTESIS($lastword);
 
@@ -30,13 +32,14 @@ function CAMPOS_ARRAY($queryparts){
         $campos_completos = SEPARAR_PUNTOS($campos_divididos[$n]);
 
         $table = $campos_completos[0];
-        $data[] = $campos_completos[1];      
+        $data[] = $campos_completos[1];
     }
     return $data;
 }
 
-function CAMPOS($queryparts){
-    $data_string="";
+function CAMPOS($queryparts)
+{
+    $data_string = "";
     $lastword = LAST_WORD(($queryparts));
     $campos = ENTRE_PARENTESIS($lastword);
 
@@ -50,18 +53,19 @@ function CAMPOS($queryparts){
 
         for ($i = 0; $i < count($data); $i++) {
             //echo "<br>" . $data[$i];
-            if($i==0){
-            $data_string = $data[$i];
-            }else{
+            if ($i == 0) {
+                $data_string = $data[$i];
+            } else {
                 $data_string = $data_string . "," . $data[$i];
             }
-        }       
+        }
     }
     return $data_string;
 }
 
-function getTable($queryparts){
-    $data_string="";
+function getTable($queryparts)
+{
+    $data_string = "";
     $lastword = LAST_WORD(($queryparts));
     $campos = ENTRE_PARENTESIS($lastword);
 
@@ -76,90 +80,152 @@ function getTable($queryparts){
 }
 
 //Valores entre parentesis CAMPOS(product.name) = product.name
-function ENTRE_PARENTESIS($cadena){
-    $regex = '#\((([^()]+|(?R))*)\)#'; 
-    if (preg_match_all($regex, $cadena ,$matches)) { 
-        return implode(' ', $matches[1]); 
-    } else { 
+function ENTRE_PARENTESIS($cadena)
+{
+    $regex = '#\((([^()]+|(?R))*)\)#';
+    if (preg_match_all($regex, $cadena, $matches)) {
+        return implode(' ', $matches[1]);
+    } else {
         //no parenthesis 
-        echo $cadena; 
-    } 
+        echo $cadena;
+    }
 }
 
 //valor fuera del parentesis CAMPOS(product.name) = CAMPOS
-function SIN_PARENTESIS($cadena){
+function SIN_PARENTESIS($cadena)
+{
     $regex = '#\((([^()]+|(?R))*)\)#';
-    return preg_replace($regex,"",$cadena);
+    return preg_replace($regex, "", $cadena);
 }
 
 //ultima palabra de un string "fruit CAMPOS(product.name)" = CAMPOS(product.name)
-function LAST_WORD($queryparts){
-  $longitud_query = count($queryparts);
-  $lastWord = $queryparts[$longitud_query -1];
+function LAST_WORD($queryparts)
+{
+    $longitud_query = count($queryparts);
+    $lastWord = $queryparts[$longitud_query - 1];
 
-  return $lastWord;
+    return $lastWord;
 }
 
 //separa el string por comas "product.name,product.lastname" = 1.product.name 2. product.lastname.
-function SEPARAR_COMAS($cadena){
-$separador = ",";
-$separada = explode($separador,$cadena);
+function SEPARAR_COMAS($cadena)
+{
+    $separador = ",";
+    $separada = explode($separador, $cadena);
 
-return $separada;
+    return $separada;
 }
 
-function SEPARAR_PUNTOS($cadena){
+function SEPARAR_PUNTOS($cadena)
+{
     $separador = ".";
-    $separada = explode($separador,$cadena);
-    
+    $separada = explode($separador, $cadena);
+
     return $separada;
-    }
+}
 
 //separar el string por espacios "PRODUCT OR FRUIT" = 1.PRODUCT 2.OR 3.FRUIT
-function SEPARAR_ESPACIOS($cadena){
+function SEPARAR_ESPACIOS($cadena)
+{
     $separador = " ";
-    $separada = explode($separador,$cadena);
+    $separada = explode($separador, $cadena);
 
     return $separada;
+}
+
+function BUSCARPALABRAS_PARENTESIS($cadena, $queryparts)
+{
+    $palabraParentesis = "";
+    //$palabra_parentesis = false;
+    for ($j = 0; $j < count($queryparts); $j++) {
+        $regex = '#\((([^()]+|(?R))*)\)#';
+        $parentesis = substr($queryparts[$j], -1, 1);
+        //echo "parentesis = " . $parentesis;
+        if (($parentesis == ')') && (SIN_PARENTESIS($queryparts[$j]) == $cadena)) {
+            //$palabra_parentesis = true;
+            $palabraParentesis = $queryparts[$j];
+        }
+    }
+    return $palabraParentesis;;
+}
+
+function BUSCARPALABRAS_PARENTESIS_BOOLEAN($cadena, $queryparts)
+{
+    //$palabraParentesis = "";
+    $palabra_parentesis = false;
+    for ($j = 0; $j < count($queryparts); $j++) {
+        $regex = '#\((([^()]+|(?R))*)\)#';
+        $parentesis = substr($queryparts[$j], -1, 1);
+        //echo "parentesis = " . $parentesis;
+        if (($parentesis == ')') && (SIN_PARENTESIS($queryparts[$j]) == $cadena)) {
+            $palabra_parentesis = true;
+            // $palabraParentesis = $queryparts[$j];
+        }
+    }
+    return $palabra_parentesis;;
 }
 
 
 //-------------- FUNCTIONS OPERATORS --------------
 
-function OPERATOR_OR($data_string, $operator,$query){
+function OPERATOR_OR($data_string, $operator, $query)
+{
     $sentence_or = " " . $operator . " Concat(" . $data_string . ") LIKE "   . "'%" . $query . "%' ";
     return $sentence_or;
 }
 
-function OPERATOR_ANDNOT($data_string,$operator,$not,$query){
-    $sentence_andnot = " ". $operator . " " . $not . " Concat(" . $data_string .") LIKE  " . "'%" . $query . "%' ";
+function OPERATOR_ANDNOT($data_string, $operator, $not, $query)
+{
+    $sentence_andnot = " " . $operator . " " . $not . " Concat(" . $data_string . ") LIKE  " . "'%" . $query . "%' ";
     return $sentence_andnot;
 }
 
-function OPERATOR_AND($data_string,$operator,$query){
-    $sentence_and =  " ". $operator .  " Concat(".$data_string . ") LIKE  " . "'%" . $query . "%' ";
+function OPERATOR_AND($data_string, $operator, $query)
+{
+    $sentence_and =  " " . $operator .  " Concat(" . $data_string . ") LIKE  " . "'%" . $query . "%' ";
     return $sentence_and;
 }
 
 //-------------- OPERATIONS -------------
 
-function QUERY($campos,$queryparts, $initialSentence,$OR,$AND,$NOT){
+function QUERY($campos, $query, $queryparts, $initialSentence, $OR, $AND, $NOT)
+{
     for ($j = 0; $j < count($queryparts); $j++) {
         echo "<br>" . $queryparts[$j];
         if ($queryparts[$j] == $OR) {
-            $sentence_or = OPERATOR_OR($campos,$queryparts[$j], $queryparts[$j + 1]);
-             $initialSentence = $initialSentence . $sentence_or;
+
+            echo " <br> BUSCAR PALABRA = " . BUSCARPALABRAS_PARENTESIS("CADENA", $queryparts);
+            echo "<br> QUERYPARTS = " . $queryparts[$j + 1];
+            $parentesis = substr($queryparts[$j + 1], -1, 1);
+
+            if ($parentesis != ')') {
+                $sentence_complete = $queryparts[$j + 1] . " " . $queryparts[$j + 2];
+                echo "<br> SENTENCE COMPLETE : " . $sentence_complete;
+            } else {
+                $sentence_complete = $queryparts[$j + 1];
+                echo "<br> SENTENCE COMPLETE : " . $sentence_complete;
+            }
+
+            if (BUSCARPALABRAS_PARENTESIS("CADENA", $queryparts) == $queryparts[$j + 1]) {
+                $parentesis = substr($queryparts[$j + 1], -1, 1);
+                echo "<br> parentesis: " . $parentesis;
+                $sentence_or = OPERATOR_OR($campos, $queryparts[$j], ENTRE_PARENTESIS($queryparts[$j + 1]));
+                $initialSentence = $initialSentence . $sentence_or;
+            } else {
+                $sentence_or = OPERATOR_OR($campos, $queryparts[$j], $queryparts[$j + 1]);
+                $initialSentence = $initialSentence . $sentence_or;
+            }
         } else {
             if ($queryparts[$j] == $AND) {
                 if ($queryparts[$j + 1] == $NOT) {
                     //$parenthesis = "(" . $initialSentence;
                     //$initialSentence = $parenthesis;
-                    $sentence_andnot = OPERATOR_ANDNOT($campos,$queryparts[$j], $queryparts[$j + 1], $queryparts[$j + 2]);
+                    $sentence_andnot = OPERATOR_ANDNOT($campos, $queryparts[$j], $queryparts[$j + 1], $queryparts[$j + 2]);
                     $initialSentence = $initialSentence . $sentence_andnot;
                 } else {
                     //$parenthesis = "(" . $initialSentence;
                     //$initialSentence = $parenthesis;
-                    $sentence_and = OPERATOR_AND($campos,$queryparts[$j], $queryparts[$j + 1]);
+                    $sentence_and = OPERATOR_AND($campos, $queryparts[$j], $queryparts[$j + 1]);
                     $initialSentence = $initialSentence . $sentence_and;
                 }
             }
@@ -167,5 +233,3 @@ function QUERY($campos,$queryparts, $initialSentence,$OR,$AND,$NOT){
     }
     return $initialSentence;
 }
-
-?>

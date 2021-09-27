@@ -50,7 +50,7 @@ if (isset($_REQUEST['search']) && $_REQUEST['search'] != "") {
         $sentence = "SELECT ". $campos . " FROM " . $table . " WHERE ";
         $initialSentence = "Concat(". $campos . ") LIKE " . "'%" . $queryparts[0] . "%'";
 
-        $initialSentence = QUERY($campos,$queryparts, $initialSentence,$OR,$AND,$NOT);
+        $initialSentence = QUERY($campos,$query,$queryparts, $initialSentence,$OR,$AND,$NOT);
         $sentence = $sentence . $initialSentence;
 
         echo "<br>" . $sentence . "<br>";
@@ -59,8 +59,7 @@ if (isset($_REQUEST['search']) && $_REQUEST['search'] != "") {
         if (!$result) {
             var_dump(mysqli_error($con));
             exit;
-        }
-        
+        }        
         $data = CAMPOS_ARRAY($queryparts) ;
 
         while ($row = mysqli_fetch_assoc($result)) {
@@ -78,7 +77,7 @@ if (isset($_REQUEST['search']) && $_REQUEST['search'] != "") {
 
         $campos = "product_name, quantity_per_unit, category";
 
-        $initialSentence = QUERY($campos,$queryparts, $initialSentence,$OR,$AND,$NOT);
+        $initialSentence = QUERY($campos,$query,$queryparts, $initialSentence,$OR,$AND,$NOT);
 
         $sentence = $sentence . $initialSentence;
 
