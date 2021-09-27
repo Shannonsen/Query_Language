@@ -8,23 +8,21 @@ $OR = "OR";
 $AND = "AND";
 $NOT = "NOT";
 
-$sentence = "SELECT product_name, quantity_per_unit, category FROM products  WHERE";
-
 //solicitar la consulta de javascript a php
 if (isset($_REQUEST['search']) && $_REQUEST['search'] != "") {
     $query = $_REQUEST['search'];
 
     //separar la consulta en palabras
-    $queryparts = SEPARAR_ESPACIOS($query);
+    $queryparts = BREAK_SPACES($query);
 
     $data = array();
     $campos = "";
 
-    if (SIN_PARENTESIS(LAST_WORD($queryparts)) == "CAMPOS") {
+    if (WITHOUT_PARENTHESES(LAST_WORD($queryparts)) == "CAMPOS") {
 
         echo "ENTRE";
 
-        $campos = CAMPOS($queryparts);
+        $campos = FIELDS($queryparts);
         $table = getTable($queryparts);
 
         echo "TABLA: ". $table;
@@ -39,7 +37,7 @@ if (isset($_REQUEST['search']) && $_REQUEST['search'] != "") {
             exit;
         }
 
-        $data = CAMPOS_ARRAY($queryparts);
+        $data = FIELDS_ARRAY($queryparts);
 
         while ($row = mysqli_fetch_assoc($result)) {
 

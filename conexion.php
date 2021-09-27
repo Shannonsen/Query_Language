@@ -16,16 +16,16 @@ function connect()
     return $con;
 }
 
-function CAMPOS_ARRAY($queryparts)
+function FIELDS_ARRAY($queryparts)
 {
     $data = array();
     $lastword = LAST_WORD(($queryparts));
-    $campos = ENTRE_PARENTESIS($lastword);
+    $campos = BETWEEN_PARENTHESES($lastword);
 
-    $campos_divididos = SEPARAR_COMAS($campos);
+    $campos_divididos = BREAK_COMMAS($campos);
     for ($n = 0; $n < count($campos_divididos); $n++) {
         echo "<br>" . $campos_divididos[$n];
-        $campos_completos = SEPARAR_PUNTOS($campos_divididos[$n]);
+        $campos_completos = BREAK_POINTS($campos_divididos[$n]);
 
         $table = $campos_completos[0];
         $data[] = $campos_completos[1];
@@ -33,16 +33,16 @@ function CAMPOS_ARRAY($queryparts)
     return $data;
 }
 
-function CAMPOS($queryparts)
+function FIELDS($queryparts)
 {
     $data_string = "";
     $lastword = LAST_WORD(($queryparts));
-    $campos = ENTRE_PARENTESIS($lastword);
+    $campos = BETWEEN_PARENTHESES($lastword);
 
-    $campos_divididos = SEPARAR_COMAS($campos);
+    $campos_divididos = BREAK_COMMAS($campos);
     for ($n = 0; $n < count($campos_divididos); $n++) {
         echo "<br>" . $campos_divididos[$n];
-        $campos_completos = SEPARAR_PUNTOS($campos_divididos[$n]);
+        $campos_completos = BREAK_POINTS($campos_divididos[$n]);
 
         $table = $campos_completos[0];
         $data[] = $campos_completos[1];
@@ -63,12 +63,12 @@ function getTable($queryparts)
 {
     $data_string = "";
     $lastword = LAST_WORD(($queryparts));
-    $campos = ENTRE_PARENTESIS($lastword);
+    $campos = BETWEEN_PARENTHESES($lastword);
 
-    $campos_divididos = SEPARAR_COMAS($campos);
+    $campos_divididos = BREAK_COMMAS($campos);
     for ($n = 0; $n < count($campos_divididos); $n++) {
         echo "<br>" . $campos_divididos[$n];
-        $campos_completos = SEPARAR_PUNTOS($campos_divididos[$n]);
+        $campos_completos = BREAK_POINTS($campos_divididos[$n]);
 
         $table = $campos_completos[0];
     }
@@ -76,7 +76,7 @@ function getTable($queryparts)
 }
 
 //Valores entre parentesis CAMPOS(product.name) = product.name
-function ENTRE_PARENTESIS($cadena)
+function BETWEEN_PARENTHESES($cadena)
 {
     $regex = '#\((([^()]+|(?R))*)\)#';
     if (preg_match_all($regex, $cadena, $matches)) {
@@ -88,7 +88,7 @@ function ENTRE_PARENTESIS($cadena)
 }
 
 //valor fuera del parentesis CAMPOS(product.name) = CAMPOS
-function SIN_PARENTESIS($cadena)
+function WITHOUT_PARENTHESES($cadena)
 {
     $regex = '#\((([^()]+|(?R))*)\)#';
     return preg_replace($regex, "", $cadena);
@@ -104,7 +104,7 @@ function LAST_WORD($queryparts)
 }
 
 //separa el string por comas "product.name,product.lastname" = 1.product.name 2. product.lastname.
-function SEPARAR_COMAS($cadena)
+function BREAK_COMMAS($cadena)
 {
     $separador = ",";
     $separada = explode($separador, $cadena);
@@ -112,7 +112,8 @@ function SEPARAR_COMAS($cadena)
     return $separada;
 }
 
-function SEPARAR_PUNTOS($cadena)
+//separa el string por puntos "products.product.name" = 1.products 2. product.name.
+function BREAK_POINTS($cadena)
 {
     $separador = ".";
     $separada = explode($separador, $cadena);
@@ -121,7 +122,7 @@ function SEPARAR_PUNTOS($cadena)
 }
 
 //separar el string por espacios "PRODUCT OR FRUIT" = 1.PRODUCT 2.OR 3.FRUIT
-function SEPARAR_ESPACIOS($cadena)
+function BREAK_SPACES($cadena)
 {
     $separador = " ";
     $separada = explode($separador, $cadena);
@@ -180,3 +181,4 @@ function QUERY($queryparts, $fields)
 
     return $query_final;
 }
+
