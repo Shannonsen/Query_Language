@@ -1,0 +1,56 @@
+body{
+    background-color:white;
+}
+
+h1{
+    font-size: 250%;
+    
+}
+
+form{
+    margin: auto;
+    max-width: 60%;
+    padding: 1%;
+    text-align: center;
+}
+
+.title {
+    margin: auto;
+    max-width: 60%;
+    padding: 1%;
+    text-align: center;
+    font-family: "Consolas", monospace;
+}
+
+#search{
+    border:0px solid; 
+    background: #f2f2f2;
+    width: 50%;
+    margin: 0 0 0;
+    padding: 1%;
+    box-sizing: border-box;
+    font-size: 15px;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.03);
+}
+
+.btn {
+    color: #318aac;
+    font-size: 85%;
+    font-weight: 2%;
+    padding: 0.5em 1.2em;
+    background: rgba(0,0,0,0);
+    border: 1% solid;
+    border-color: #318aac;
+    transition: all 1s ease;
+    position: relative;
+  }
+  .btn:hover {
+    background: #318aac;
+    color: #fff;
+  }
+
+  .query{
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  
