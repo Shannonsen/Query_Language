@@ -35,8 +35,8 @@
 
             $data = array();
 
-            if (WITHOUT_PARENTHESES(LAST_WORD($queryparts)) == "CAMPOS") {
-                //echo "CAMPOS ENTRE";
+            //STRPOS = Dentro del string query se encuentran los caracteres CAMPOS
+            if (strpos($query, "CAMPOS")) {
                 $campos = FIELDS($queryparts); //String de campos
                 $table = getTable($queryparts); //String de tabla
                 $query_complete = QUERY($queryparts, $campos); //QUERY completo para solicitar

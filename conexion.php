@@ -48,7 +48,7 @@ function FIELDS($queryparts)
 
     $campos_divididos = BREAK_COMMAS($campos);
     for ($n = 0; $n < count($campos_divididos); $n++) {
-       // echo "<br>" . $campos_divididos[$n];
+        // echo "<br>" . $campos_divididos[$n];
         $campos_completos = BREAK_POINTS($campos_divididos[$n]);
 
         $table = $campos_completos[0];
@@ -105,9 +105,25 @@ function WITHOUT_PARENTHESES($cadena)
 //ultima palabra de un string "fruit CAMPOS(product.name)" = CAMPOS(product.name)
 function LAST_WORD($queryparts)
 {
+    $number = 1;
     $longitud_query = count($queryparts);
-    $lastWord = $queryparts[$longitud_query - 1];
+    $lastWord = $queryparts[$longitud_query - $number];
+    //echo "LASTWORD: ". $lastWord;
+    $caseCampos = "";
+    $temporal_lastword = "";
 
+    if (!strpos($lastWord, "(")) {
+        while (!strpos($lastWord, "(")) {
+            $number++;
+            $caseCampos = $queryparts[$longitud_query - $number];
+            //echo "CASE CAMPOS: ". $caseCampos;
+            $temporal_lastword = $lastWord;
+            $lastWord = $caseCampos . " " . $temporal_lastword;
+            //echo "LAST WORD ACTUAL: ". $lastWord;
+        }
+    }
+
+    //echo "SALI COMO: " . $lastWord;
     return $lastWord;
 }
 
@@ -116,7 +132,6 @@ function BREAK_COMMAS($cadena)
 {
     $separador = ",";
     $separada = explode($separador, $cadena);
-
     return $separada;
 }
 
@@ -151,8 +166,10 @@ function QUERY($queryparts, $fields)
 {
     $query_initial = "SELECT " . $fields . " FROM " . "products " . "WHERE ";
     $query = "";
-    $campos="";
+    $campos = "";
     $count = 0;
+    $caseCadena = "";
+    $caseCAMPOS = "";
 
     for ($j = 0; $j < count($queryparts); $j++) {
         switch ($queryparts[$j]) {
@@ -178,10 +195,25 @@ function QUERY($queryparts, $fields)
                 $verification = strstr($queryparts[$j], '(', true); //verifica si es CADENA O PATRON.
                 switch ($verification) {
                     case 'CADENA':
-                        echo " <br> QUERYPARTS: " . $queryparts[$j] . " <br>";
-                        $Inside_parentheses = substr(strstr($queryparts[$j], '('), 1, -1);
-                        $query .= QUERY_CONCAT($fields, $Inside_parentheses);
-                        $count++;
+                        if (strpos($queryparts[$j], ")")) {
+                            echo " <br> QUERYPARTS: " . $queryparts[$j] . " <br>";
+                            $Inside_parentheses = substr(strstr($queryparts[$j], '('), 1, -1);
+                            $query .= QUERY_CONCAT($fields, $Inside_parentheses);
+                            $count++;
+                        } else {
+                            echo " <br> QUERYPARTS: " . $queryparts[$j] . " <br>";
+                            while (!strpos($queryparts[$j], ")")) {
+                                $caseCadena .= " " . $queryparts[$j];
+                                $j++;
+                                echo " <br> CADENA: " . $caseCadena;
+                            }
+
+                            $caseCadena .= " " . $queryparts[$j];
+                            echo "<br> CADENA: " . $caseCadena;
+                            $Inside_parentheses = substr(strstr($caseCadena, '('), 1, -1);
+                            $query .= QUERY_CONCAT($fields, $Inside_parentheses);
+                            $count++;
+                        }
                         break;
                     case 'PATRON':
                         $Inside_parentheses = substr(strstr($queryparts[$j], '('), 1, -1);
@@ -191,7 +223,11 @@ function QUERY($queryparts, $fields)
                     case 'CAMPOS':
                         break;
                     default:
-                        $query .= QUERY_CONCAT($fields, $queryparts[$j]);
+                        if (strpos($queryparts[$j], ")") || strpos($queryparts[$j], ".")) {
+                            break;
+                        } else {
+                            $query .= QUERY_CONCAT($fields, $queryparts[$j]);
+                        }
                         break;
                 }
                 break;
