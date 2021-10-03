@@ -196,20 +196,20 @@ function QUERY($queryparts, $fields,$table)
                 switch ($verification) {
                     case 'CADENA':
                         if (strpos($queryparts[$j], ")")) {
-                            echo " <br> QUERYPARTS: " . $queryparts[$j] . " <br>";
+                           // echo " <br> QUERYPARTS: " . $queryparts[$j] . " <br>";
                             $Inside_parentheses = substr(strstr($queryparts[$j], '('), 1, -1);
                             $query .= QUERY_CONCAT($fields, $Inside_parentheses);
                             $count++;
                         } else {
-                            echo " <br> QUERYPARTS: " . $queryparts[$j] . " <br>";
+                            //echo " <br> QUERYPARTS: " . $queryparts[$j] . " <br>";
                             while (!strpos($queryparts[$j], ")")) {
                                 $caseCadena .= " " . $queryparts[$j];
                                 $j++;
-                                echo " <br> CADENA: " . $caseCadena;
+                               // echo " <br> CADENA: " . $caseCadena;
                             }
 
                             $caseCadena .= " " . $queryparts[$j];
-                            echo "<br> CADENA: " . $caseCadena;
+                            //echo "<br> CADENA: " . $caseCadena;
                             $Inside_parentheses = substr(strstr($caseCadena, '('), 1, -1);
                             $query .= QUERY_CONCAT($fields, $Inside_parentheses);
                             $count++;
