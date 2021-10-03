@@ -38,7 +38,7 @@
             if (strpos($query, "CAMPOS")) {
                 $campos = FIELDS($queryparts); //String de campos
                 $table = getTable($queryparts); //String de tabla
-                $query_complete = QUERY($queryparts, $campos); //QUERY completo para solicitar
+                $query_complete = QUERY($queryparts, $campos, $table); //QUERY completo para solicitar
 
                 echo "<br> Query:" . $query_complete . "<br>";
 
@@ -64,8 +64,9 @@
                     echo "<br>";
                 }
             } else {
+                $table = "products";
                 $campos = "product_name,quantity_per_unit,category"; //String campos preterminados
-                $query_complete = QUERY($queryparts, $campos);
+                $query_complete = QUERY($queryparts, $campos, $table);
 
                 echo "<br> Query: " . $query_complete . "<br>";
                 $result = mysqli_query($con, $query_complete); //Consulta

@@ -162,9 +162,9 @@ function QUERY_CONCAT($fields, $query)
     return $query_concat;
 }
 
-function QUERY($queryparts, $fields)
+function QUERY($queryparts, $fields,$table)
 {
-    $query_initial = "SELECT " . $fields . " FROM " . "products " . "WHERE ";
+    $query_initial = "SELECT " . $fields . " FROM " . $table . " WHERE ";
     $query = "";
     $campos = "";
     $count = 0;
