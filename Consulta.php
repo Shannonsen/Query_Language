@@ -28,11 +28,10 @@
 
         //solicitar la consulta de javascript a php
         if (isset($_REQUEST['search']) && $_REQUEST['search'] != "") {
-            $query = $_REQUEST['search'];
+            $query = strtoupper($_REQUEST['search']); //Volver la busqueda en mayusculas para condiciones en QUERY.
 
             //separar la consulta en palabras cada vez que se encuentre un espacio
             $queryparts = BREAK_SPACES($query);
-
             $data = array();
 
             //STRPOS = Dentro del string query se encuentran los caracteres CAMPOS
@@ -41,7 +40,7 @@
                 $table = getTable($queryparts); //String de tabla
                 $query_complete = QUERY($queryparts, $campos); //QUERY completo para solicitar
 
-                echo "<br>" . $query_complete . "<br>";
+                echo "<br> Query:" . $query_complete . "<br>";
 
                 $result = mysqli_query($con, $query_complete); //consulta
 
@@ -68,7 +67,7 @@
                 $campos = "product_name,quantity_per_unit,category"; //String campos preterminados
                 $query_complete = QUERY($queryparts, $campos);
 
-                echo "<br>" . $query_complete . "<br>";
+                echo "<br> Query: " . $query_complete . "<br>";
                 $result = mysqli_query($con, $query_complete); //Consulta
 
                 if (!$result) {
